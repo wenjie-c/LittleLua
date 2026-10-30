@@ -63,10 +63,10 @@ string LittleLua::getString(const char *variable) {
     throw LuaException("The top stack variable is not a string.");
 }
 
-vector<int> LittleLua::getIntegerArray(const char *variable) {
+vector<int> LittleLua::getIntegerVector(const char *variable) {
   // idx = 1; // tracking array front
   vector<int> res;
-  lua_getglobal(_state, "numbers");
+  lua_getglobal(_state, variable);
   if (lua_istable(_state, -1)) {
     for (idx = -1; lua_geti(_state, idx, -idx); idx--) {
       // Always push the first value to top
@@ -81,11 +81,11 @@ vector<int> LittleLua::getIntegerArray(const char *variable) {
   return res;
 }
 
-vector<double> LittleLua::getNumberArray(const char *variable) 
+vector<double> LittleLua::getNumberVector(const char *variable) 
 {
   // idx = 1; // tracking array front
   vector<double> res;
-  lua_getglobal(_state, "numbers");
+  lua_getglobal(_state, variable);
   if (lua_istable(_state, -1)) {
     for (idx = -1; lua_geti(_state, idx, -idx); idx--) {
       // Always push the first value to top
@@ -99,10 +99,10 @@ vector<double> LittleLua::getNumberArray(const char *variable)
     throw LuaException(lua_tostring(_state, -1));
   return res;
 }
-vector<bool> LittleLua::getBoolArray(const char *variable) {
+vector<bool> LittleLua::getBoolVector(const char *variable) {
   // idx = 1; // tracking array front
   vector<bool> res;
-  lua_getglobal(_state, "numbers");
+  lua_getglobal(_state, variable);
   if (lua_istable(_state, -1)) {
     for (idx = -1; lua_geti(_state, idx, -idx); idx--) {
       // Always push the first value to top
@@ -116,10 +116,10 @@ vector<bool> LittleLua::getBoolArray(const char *variable) {
     throw LuaException(lua_tostring(_state, -1));
   return res;
 }
-vector<string> LittleLua::getStringArray(const char *variable) {
+vector<string> LittleLua::getStringVector(const char *variable) {
   // idx = 1; // tracking array front
   vector<string> res;
-  lua_getglobal(_state, "numbers");
+  lua_getglobal(_state, variable);
   if (lua_istable(_state, -1)) {
     for (idx = -1; lua_geti(_state, idx, -idx); idx--) {
       // Always push the first value to top

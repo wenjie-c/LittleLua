@@ -34,11 +34,11 @@ public:
   double getNumber(const char * variable); // or getDouble
   bool getBool(const char * variable);
   string getString(const char * variable);
-  vector<int> getIntegerArray(const char * variable);
 
-  vector<double> getNumberArray(const char * variable);
-  vector<bool> getBoolArray(const char * variable);
-  vector<string> getStringArray(const char * variable);
+  vector<int> getIntegerVector(const char * variable);
+  vector<double> getNumberVector(const char * variable);
+  vector<bool> getBoolVector(const char * variable);
+  vector<string> getStringVector(const char * variable);
 
   #pragma endregion getters
 
