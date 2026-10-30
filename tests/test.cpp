@@ -49,6 +49,59 @@ TEST(LuaTest, GetterArrayTest) {
   lua.close();
 }
 
+TEST(LuaTest, TableTest) {
+  LittleLua lua;
+  string name;
+  string surname;
+
+  int age;
+  double weight;
+
+  lua.init();
+  try {
+    ASSERT_NO_THROW(lua.executeFile(path1));
+  } catch (LuaException e) {
+    cerr << e.what() << endl;
+  }
+  ASSERT_NO_THROW(lua.openTable("mytable"));
+  ASSERT_NO_THROW(name = lua.getStringFromTable("name"));
+  ASSERT_NO_THROW(surname = lua.getStringFromTable("surname"));
+  ASSERT_NO_THROW(age = lua.getIntegerFromTable("age"));
+  ASSERT_NO_THROW(weight = lua.getNumberFromTable("weight"));
+
+  ASSERT_TRUE(name.compare("Alan") == 0);
+  ASSERT_TRUE(surname.compare("Donnor") == 0);
+  ASSERT_EQ(age, 67);
+  ASSERT_EQ(weight, 69.5f);
+
+  lua.close();
+}
+
+// This only works if "more" were a global variable, but it is a field from this table.
+/* TEST(LuaTest, Table2Test) {
+  LittleLua lua;
+  string name;
+  string food;
+
+  lua.init();
+  try {
+    ASSERT_NO_THROW(lua.executeFile(path1));
+  } catch (LuaException e) {
+    cerr << e.what() << endl;
+  }
+  ASSERT_NO_THROW(lua.openTable("mytable"));
+  ASSERT_NO_THROW(name = lua.getStringFromTable("name"));
+  lua.openTable("more");
+  ASSERT_NO_THROW(food = lua.getStringFromTable("food"));
+  
+
+  ASSERT_TRUE(name.compare("Alan") == 0);
+  ASSERT_TRUE(food.compare("cheese") == 0);
+  
+
+  lua.close();
+} */
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

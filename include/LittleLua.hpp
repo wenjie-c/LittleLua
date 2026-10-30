@@ -40,6 +40,17 @@ public:
   vector<bool> getBoolVector(const char * variable);
   vector<string> getStringVector(const char * variable);
 
+  /**
+   * @brief Get into a lua table, the internal _idx is going to track it. It only reaches 1 depth level.
+   * 
+   * @param variable The name of the table
+   */
+  void openTable(const char * variable);
+  int getIntegerFromTable(const char * variable);
+  double getNumberFromTable(const char * variable);
+  bool getBoolFromTable(const char * variable);
+  string getStringFromTable(const char * variable);
+
   #pragma endregion getters
 
   ~LittleLua() {
@@ -50,7 +61,7 @@ public:
 private:
 #pragma region LittleLua_VARIABLES
   lua_State *_state;
-  unsigned int idx = 0;
+  int _idx = -1;
 #pragma endregion LittleLua_VARIABLES
 };
 #endif // LittleLua_HPP
