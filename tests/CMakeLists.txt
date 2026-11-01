@@ -10,7 +10,7 @@ FetchContent_MakeAvailable(googletest)
 add_library(GTest::GTest INTERFACE IMPORTED)
 target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
-add_executable(tests test.cpp)
+add_executable(tests test.cpp settings.cpp)
 
 target_link_libraries(tests PRIVATE GTest::GTest LittleLua)
 

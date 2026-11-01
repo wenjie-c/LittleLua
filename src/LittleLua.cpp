@@ -179,4 +179,15 @@ string LittleLua::getStringFromTable(const char *variable) {
   return string("");
 }
 
+template <typename T> T LittleLua::deserializate(const char *variable) {
+  // Deserialization using the member function
+  /* T container;
+  this->openTable(variable);
+  container.from_lua(_state, _idx);
+  return container; */
+  // Deserialization using the constructor
+  this->openTable(variable);
+  return T(_state, _idx);
+}
+
 #pragma endregion getters

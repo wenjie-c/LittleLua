@@ -1,11 +1,14 @@
 #include <LittleLua.hpp>
+#include "../src/LittleLua.cpp"
 #include <cstddef>
 #include <gtest/gtest.h>
 #include <iostream>
+#include "settings.cpp"
 
 using namespace std;
 
 const char *path1 = "example1.lua";
+const char *path2 = "example2.lua";
 
 TEST(LuaTest, PrintTest) {
   LittleLua lua;
@@ -75,6 +78,16 @@ TEST(LuaTest, TableTest) {
   ASSERT_EQ(weight, 69.5f);
 
   lua.close();
+}
+
+TEST(LuaTest, DeserializeTest)
+{
+  LittleLua lua;
+  lua.init();
+  ASSERT_NO_THROW(lua.executeFile(path2));
+  Settings s = lua.deserializate<Settings>("example");
+  // ASSERT_NO_THROW(s = lua.deserializate<Settings>("example"));
+  cout << s.toString() << endl;
 }
 
 // This only works if "more" were a global variable, but it is a field from this table.
