@@ -9,6 +9,7 @@ using namespace std;
 
 const char *path1 = "example1.lua";
 const char *path2 = "example2.lua";
+const char *path3 = "example3.lua";
 
 TEST(LuaTest, PrintTest) {
   LittleLua lua;
@@ -88,6 +89,18 @@ TEST(LuaTest, DeserializeTest)
   Settings s = lua.deserializate<Settings>("example");
   // ASSERT_NO_THROW(s = lua.deserializate<Settings>("example"));
   cout << s.toString() << endl;
+}
+
+TEST(LuaTest, SetterTest)
+{
+  LittleLua lua;
+  lua.init();
+  constexpr int code = 67;
+  char name[] = "Bobby";
+  lua.setInteger("code", code);
+  lua.setString("name",name);
+  ASSERT_NO_THROW(lua.executeFile(path3));
+  lua.close();
 }
 
 // This only works if "more" were a global variable, but it is a field from this table.

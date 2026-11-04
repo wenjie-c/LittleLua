@@ -55,6 +55,15 @@ public:
 
 #pragma endregion getters
 
+// Use it before executing a file or code
+#pragma region setters
+  void setInteger(const char *name, const int value);
+  void setNumber(const char *name, const double value);
+  void setBool(const char *name, const bool value);
+  void setString(const char *name, const char *value);
+  void setString(const char *name, const string value);
+#pragma endregion setters
+
   template <typename T> T deserializate(const char *variable);
 
   ~LittleLua() {

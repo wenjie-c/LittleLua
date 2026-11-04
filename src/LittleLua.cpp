@@ -1,3 +1,4 @@
+#include "lua.h"
 #include <LittleLua.hpp>
 
 void LittleLua::init() {
@@ -191,3 +192,25 @@ template <typename T> T LittleLua::deserializate(const char *variable) {
 }
 
 #pragma endregion getters
+
+#pragma region setters
+void LittleLua::setInteger(const char *name, const int value) {
+  lua_pushinteger(_state, value);
+  lua_setglobal(_state, name);
+}
+void LittleLua::setNumber(const char *name, const double value) {
+  lua_pushnumber(_state, value);
+  lua_setglobal(_state, name);
+}
+void LittleLua::setBool(const char *name, const bool value) {
+  lua_pushboolean(_state, value);
+  lua_setglobal(_state, name);
+}
+void LittleLua::setString(const char *name, const char *value) {
+  lua_pushstring(_state, value);
+  lua_setglobal(_state, name);
+}
+void LittleLua::setString(const char *name, const string value) {
+  setString(name, value.c_str());
+}
+#pragma endregion setters
