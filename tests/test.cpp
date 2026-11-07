@@ -1,15 +1,16 @@
-#include <LittleLua.hpp>
 #include "../src/LittleLua.cpp"
+#include "settings.cpp"
+#include <LittleLua.hpp>
 #include <cstddef>
 #include <gtest/gtest.h>
 #include <iostream>
-#include "settings.cpp"
 
 using namespace std;
 
 const char *path1 = "example1.lua";
 const char *path2 = "example2.lua";
 const char *path3 = "example3.lua";
+const char *path4 = "example4.lua";
 
 TEST(LuaTest, PrintTest) {
   LittleLua lua;
@@ -81,8 +82,7 @@ TEST(LuaTest, TableTest) {
   lua.close();
 }
 
-TEST(LuaTest, DeserializeTest)
-{
+TEST(LuaTest, DeserializeTest) {
   LittleLua lua;
   lua.init();
   ASSERT_NO_THROW(lua.executeFile(path2));
@@ -91,19 +91,38 @@ TEST(LuaTest, DeserializeTest)
   cout << s.toString() << endl;
 }
 
-TEST(LuaTest, SetterTest)
-{
+TEST(LuaTest, SetterTest) {
   LittleLua lua;
   lua.init();
   constexpr int code = 67;
   char name[] = "Bobby";
   lua.setInteger("code", code);
-  lua.setString("name",name);
+  lua.setString("name", name);
   ASSERT_NO_THROW(lua.executeFile(path3));
   lua.close();
 }
 
-// This only works if "more" were a global variable, but it is a field from this table.
+TEST(LuaTest, TableSetterTest) {
+  LittleLua lua;
+  lua.init();
+
+  ASSERT_NO_THROW(lua.executeFile(path4));
+  ASSERT_NO_THROW(lua.openTable("example2"));
+  ASSERT_NO_THROW(lua.setIntegerFromTable("width", 800));
+  ASSERT_NO_THROW(lua.setIntegerFromTable("height", 600));
+  ASSERT_NO_THROW(lua.setBoolFromTable("debug", false));
+  ASSERT_NO_THROW(lua.setStringFromTable("title", "Barcelona"));
+
+  ASSERT_EQ(lua.getIntegerFromTable("width"), 800);
+  ASSERT_EQ(lua.getIntegerFromTable("height"), 600);
+  ASSERT_EQ(lua.getBoolFromTable("debug"), false);
+  ASSERT_TRUE(string("Barcelona").compare(lua.getStringFromTable("title")) ==
+              0);
+  lua.close();
+}
+
+// This only works if "more" were a global variable, but it is a field from this
+// table.
 /* TEST(LuaTest, Table2Test) {
   LittleLua lua;
   string name;
@@ -119,11 +138,11 @@ TEST(LuaTest, SetterTest)
   ASSERT_NO_THROW(name = lua.getStringFromTable("name"));
   lua.openTable("more");
   ASSERT_NO_THROW(food = lua.getStringFromTable("food"));
-  
+
 
   ASSERT_TRUE(name.compare("Alan") == 0);
   ASSERT_TRUE(food.compare("cheese") == 0);
-  
+
 
   lua.close();
 } */

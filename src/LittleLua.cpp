@@ -1,4 +1,3 @@
-#include "lua.h"
 #include <LittleLua.hpp>
 
 void LittleLua::init() {
@@ -213,4 +212,26 @@ void LittleLua::setString(const char *name, const char *value) {
 void LittleLua::setString(const char *name, const string value) {
   setString(name, value.c_str());
 }
+
+void LittleLua::setIntegerFromTable(const char *name, const int value) {
+  lua_pushinteger(_state, value);
+  //--_idx;
+  lua_setfield(_state, -2, name); // idx is fixed on -2 because everytime that a value is setted, the value is popped out by lua
+}
+void LittleLua::setNumberFromTable(const char *name, const double value) {
+  lua_pushnumber(_state, value);
+  //--_idx;
+  lua_setfield(_state, -2, name);
+}
+void LittleLua::setBoolFromTable(const char *name, const bool value) {
+  lua_pushboolean(_state, value);
+  //--_idx;
+  lua_setfield(_state, -2, name);
+}
+void LittleLua::setStringFromTable(const char *name, const char *value) {
+  lua_pushstring(_state, value);
+  //--_idx;
+  lua_setfield(_state, -2, name);
+}
+
 #pragma endregion setters
