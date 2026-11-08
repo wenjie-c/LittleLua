@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -11,6 +12,7 @@ const char *path1 = "example1.lua";
 const char *path2 = "example2.lua";
 const char *path3 = "example3.lua";
 const char *path4 = "example4.lua";
+const char *path5 = "example5.lua";
 
 TEST(LuaTest, PrintTest) {
   LittleLua lua;
@@ -51,6 +53,8 @@ TEST(LuaTest, GetterArrayTest) {
     cout << i << " : " << fruits.at(i) << endl;
   }
 
+  //lua.dumpstack();
+
   lua.close();
 }
 
@@ -58,6 +62,8 @@ TEST(LuaTest, TableTest) {
   LittleLua lua;
   string name;
   string surname;
+  vector<double> numbers;
+  vector<string> cities;
 
   int age;
   double weight;
@@ -73,6 +79,20 @@ TEST(LuaTest, TableTest) {
   ASSERT_NO_THROW(surname = lua.getStringFromTable("surname"));
   ASSERT_NO_THROW(age = lua.getIntegerFromTable("age"));
   ASSERT_NO_THROW(weight = lua.getNumberFromTable("weight"));
+
+  //lua.dumpstack();
+
+  ASSERT_NO_THROW(numbers = lua.getNumberVectorFromTable("real"));
+  for (int i = 0; i < numbers.size(); i++) {
+    cout << i << " : " << numbers.at(i) << endl;
+  }
+
+  //lua.dumpstack();
+
+  ASSERT_NO_THROW(cities = lua.getStringVectorFromTable("cities"));
+  for (int i = 0; i < cities.size(); i++) {
+    cout << i << " : " << cities.at(i) << endl;
+  }
 
   ASSERT_TRUE(name.compare("Alan") == 0);
   ASSERT_TRUE(surname.compare("Donnor") == 0);
