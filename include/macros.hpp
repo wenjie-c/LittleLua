@@ -94,28 +94,28 @@ extern "C" {
 
 // These works
 //#define LITTLELUA_DESERIALIZE_INIT() int idx = -1;
-#define LITTLELUA_DESERIALIZE_INT_MEMBER(x) lua_getfield(lua, idx, #x);  \
+#define LITTLELUA_DESERIALIZE_INT_MEMBER(x) lua_getfield(lua, -1, #x);  \
   if(!lua_isinteger(lua, -1)) throw LuaException("This member is not an integer.");  \
   this->x = lua_tointeger(lua, -1);  \
-  idx--;
-#define LITTLELUA_DESERIALIZE_DOUBLE_MEMBER(x) lua_getfield(lua, idx, #x);  \
+  lua_pop(lua,1);
+#define LITTLELUA_DESERIALIZE_DOUBLE_MEMBER(x) lua_getfield(lua, -1, #x);  \
   if(!lua_isnumber(lua, -1)) throw LuaException("This member is not a double or float.");  \
   this->x = lua_tonumber(lua, -1);  \
-  idx--;
-#define LITTLELUA_DESERIALIZE_BOOL_MEMBER(x) lua_getfield(lua, idx, #x);  \
+  lua_pop(lua,1);
+#define LITTLELUA_DESERIALIZE_BOOL_MEMBER(x) lua_getfield(lua, -1, #x);  \
   if(!lua_isboolean(lua, -1)) throw LuaException("This member is not a boolean.");  \
   this->x = lua_toboolean(lua, -1);  \
-  idx--;
-#define LITTLELUA_DESERIALIZE_STRING_MEMBER(x) lua_getfield(lua, idx, #x);  \
+  lua_pop(lua,1);
+#define LITTLELUA_DESERIALIZE_STRING_MEMBER(x) lua_getfield(lua, -1, #x);  \
   if(!lua_isstring(lua, -1)) throw LuaException("This member is not a string.");  \
   this->x = lua_tostring(lua, -1);  \
-  idx--;
+  lua_pop(lua,1);
 
   /**
    * @brief Deserialize constructor definition
    * @param lua Internal lua_State pointer.
    * @param idx Internal stack index to know where is the table.
    */
-#define  LITTLELUA_DESERIALIZE_CONSTRUCTOR(Type) Type(lua_State * lua, int idx = -1)
+#define  LITTLELUA_DESERIALIZE_CONSTRUCTOR(Type) Type(lua_State * lua)
 
 #pragma endregion Macros

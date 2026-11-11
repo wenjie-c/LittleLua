@@ -90,6 +90,7 @@ public:
 
   void dumpstack() {
     int top = lua_gettop(_state);
+    printf("--- Dumping lua stack ---\n");
     for (int i = 1; i <= top; i++) {
       printf("%d\t%s\t", i, luaL_typename(_state, i));
       switch (lua_type(_state, i)) {

@@ -1,7 +1,6 @@
 #include <LittleLua.hpp>
 
-// TODO Change the implementation to pop everytime that a value is obtained, but
-// keeping the table referenced. It is important to not overflow LUA_MINSTACK
+
 
 void LittleLua::init() {
   _state = luaL_newstate();
@@ -39,28 +38,36 @@ void LittleLua::executeFile(const char *path, Callback _postOperation) {
 int LittleLua::getInteger(const char *variable) {
   lua_getglobal(_state, variable);
   if (lua_isinteger(_state, -1)) {
-    return lua_tointeger(_state, -1);
+    auto value = lua_tointeger(_state, -1);
+    lua_pop(_state, 1);
+    return value;
   } else
     throw LuaException("The top stack variable is not an integer.");
 }
 double LittleLua::getNumber(const char *variable) {
   lua_getglobal(_state, variable);
   if (lua_isnumber(_state, -1)) {
-    return lua_tonumber(_state, -1);
+    auto value = lua_tonumber(_state, -1);
+    lua_pop(_state, 1);
+    return value;
   } else
     throw LuaException("The top stack variable is not a double.");
 }
 bool LittleLua::getBool(const char *variable) {
   lua_getglobal(_state, variable);
   if (lua_isboolean(_state, -1)) {
-    return lua_toboolean(_state, -1);
+    auto value = lua_toboolean(_state, -1);
+    lua_pop(_state, 1);
+    return value;
   } else
     throw LuaException("The top stack variable is not a boolean.");
 }
 string LittleLua::getString(const char *variable) {
   lua_getglobal(_state, variable);
   if (lua_isstring(_state, -1)) {
-    return lua_tostring(_state, -1);
+    auto value = lua_tostring(_state, -1);
+    lua_pop(_state, 1);
+    return value;
   } else
     throw LuaException("The top stack variable is not a string.");
 }
@@ -70,16 +77,18 @@ vector<int> LittleLua::getIntegerVector(const char *variable) {
   vector<int> res;
   lua_getglobal(_state, variable);
   if (lua_istable(_state, -1)) {
-    for (int idx = -1; lua_geti(_state, idx, -idx); idx--) {
+    for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
       // Always push the first value to top
       if (lua_isinteger(_state, -1)) {
         res.push_back(lua_tointeger(_state, -1));
+        lua_pop(_state, 1);
       } else
         throw LuaException("The top stack variable is not an integer.");
     }
   } else
     // throw LuaException("The top stack variable is not an array or a table.");
     throw LuaException(lua_tostring(_state, -1));
+  lua_pop(_state, 2);
   return res;
 }
 
@@ -88,16 +97,18 @@ vector<double> LittleLua::getNumberVector(const char *variable) {
   vector<double> res;
   lua_getglobal(_state, variable);
   if (lua_istable(_state, -1)) {
-    for (int idx = -1; lua_geti(_state, idx, -idx); idx--) {
+    for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
       // Always push the first value to top
       if (lua_isnumber(_state, -1)) {
         res.push_back(lua_tonumber(_state, -1));
+        lua_pop(_state, 1);
       } else
         throw LuaException("The top stack variable is not a double.");
     }
   } else
     // throw LuaException("The top stack variable is not an array or a table.");
     throw LuaException(lua_tostring(_state, -1));
+    lua_pop(_state, 2);
   return res;
 }
 vector<bool> LittleLua::getBoolVector(const char *variable) {
@@ -105,16 +116,18 @@ vector<bool> LittleLua::getBoolVector(const char *variable) {
   vector<bool> res;
   lua_getglobal(_state, variable);
   if (lua_istable(_state, -1)) {
-    for (int idx = -1; lua_geti(_state, idx, -idx); idx--) {
+    for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
       // Always push the first value to top
       if (lua_isboolean(_state, -1)) {
         res.push_back(lua_toboolean(_state, -1));
+        lua_pop(_state, 1);
       } else
         throw LuaException("The top stack variable is not an integer.");
     }
   } else
     // throw LuaException("The top stack variable is not an array or a table.");
     throw LuaException(lua_tostring(_state, -1));
+    lua_pop(_state, 2);
   return res;
 }
 vector<string> LittleLua::getStringVector(const char *variable) {
@@ -122,16 +135,18 @@ vector<string> LittleLua::getStringVector(const char *variable) {
   vector<string> res;
   lua_getglobal(_state, variable);
   if (lua_istable(_state, -1)) {
-    for (int idx = -1; lua_geti(_state, idx, -idx); idx--) {
+    for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
       // Always push the first value to top
       if (lua_isstring(_state, -1)) {
         res.push_back(lua_tostring(_state, -1));
+        lua_pop(_state, 1);
       } else
         throw LuaException("The top stack variable is not a string.");
     }
   } else
     // throw LuaException("The top stack variable is not an array or a table.");
     throw LuaException(lua_tostring(_state, -1));
+    lua_pop(_state, 2);
   return res;
 }
 
@@ -144,41 +159,53 @@ void LittleLua::openTable(const char *variable) {
     throw LuaException("Couldn't open the table, it is not a table.");
 }
 int LittleLua::getIntegerFromTable(const char *variable) {
-  lua_getfield(_state, _idx, variable);
+  lua_getfield(_state, -1, variable);
   if (lua_isinteger(_state, -1)) {
-    _idx--; // tracking the table
-    return lua_tointeger(_state, -1);
+    //_idx--; // tracking the table
+    auto value = lua_tointeger(_state, -1);
+    lua_pop(_state, 1);
+    return value;
   } else
     throw LuaException(lua_tostring(_state, -1));
+    lua_pop(_state, 1);
   return 0;
 }
 
 double LittleLua::getNumberFromTable(const char *variable) {
-  lua_getfield(_state, _idx, variable);
+  lua_getfield(_state, -1, variable);
   if (lua_isnumber(_state, -1)) {
-    _idx--; // tracking the table
-    return lua_tonumber(_state, -1);
+    //_idx--; // tracking the table
+    auto value = lua_tonumber(_state, -1);
+    lua_pop(_state, 1);
+    return value;
   } else
     throw LuaException(lua_tostring(_state, -1));
+    lua_pop(_state, 1);
   return 0;
 }
 
 bool LittleLua::getBoolFromTable(const char *variable) {
-  lua_getfield(_state, _idx, variable);
+  lua_getfield(_state, -1, variable);
   if (lua_isboolean(_state, -1)) {
-    _idx--; // tracking the table
-    return lua_toboolean(_state, -1);
+    //_idx--; // tracking the table
+    auto value = lua_toboolean(_state, -1);
+    lua_pop(_state, 1);
+    return value;
   } else
     throw LuaException(lua_tostring(_state, -1));
+    lua_pop(_state, 1);
   return false;
 }
 string LittleLua::getStringFromTable(const char *variable) {
-  lua_getfield(_state, _idx, variable);
+  lua_getfield(_state, -1, variable);
   if (lua_isstring(_state, -1)) {
-    _idx--; // tracking the table
-    return lua_tostring(_state, -1);
+    //_idx--; // tracking the table
+    auto value = lua_tostring(_state, -1);
+    lua_pop(_state, 1);
+    return value;
   } else
     LuaException(lua_tostring(_state, -1));
+    lua_pop(_state, 1);
   return string("");
 }
 
@@ -190,82 +217,86 @@ template <typename T> T LittleLua::deserializate(const char *variable) {
   return container; */
   // Deserialization using the constructor
   this->openTable(variable);
-  return T(_state, _idx);
+  return T(_state);
 }
 
 vector<int> LittleLua::getIntegerVectorFromTable(const char *variable) {
   vector<int> res;
-  lua_getfield(_state, _idx, variable);
+  lua_getfield(_state, -1, variable);
   if (lua_istable(_state, -1)) {
-    _idx--;
-    for (int idx = 1; lua_geti(_state, -idx, idx); idx++) {
+    //_idx--;
+    for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
       // Always push the first value to top
       if (lua_isinteger(_state, -1)) {
-        _idx--;
+        //_idx--;
         res.push_back(lua_tointeger(_state, -1));
+        lua_pop(_state, 1);
       } else
         throw LuaException("The top stack variable is not an integer.");
     }
   } else
     throw LuaException(lua_tostring(_state, -1));
   lua_pop(_state,
-          1); // [in https://www.lua.org/manual/5.4/manual.html , section 2.1 –
+          2); // [in https://www.lua.org/manual/5.4/manual.html , section 2.1 –
               // Values and Types] explains that when you try to get a non
               // existent key, pushes a nil onto the top of the stack
   return res;
 }
 vector<double> LittleLua::getNumberVectorFromTable(const char *variable) {
   vector<double> res;
-  lua_getfield(_state, _idx, variable);
+  lua_getfield(_state, -1, variable);
   if (lua_istable(_state, -1)) {
-    _idx--;
-    for (int idx = 1; lua_geti(_state, -idx, idx); idx++) {
+    //_idx--;
+    for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
       // Always push the first value to top
       if (lua_isnumber(_state, -1)) {
-        _idx--;
+        //_idx--;
         res.push_back(lua_tonumber(_state, -1));
+        lua_pop(_state, 1);
       } else
         throw LuaException("The top stack variable is not a number.");
     }
   } else
     throw LuaException(lua_tostring(_state, -1));
-  lua_pop(_state, 1);
+  lua_pop(_state, 2);
   return res;
 }
 vector<bool> LittleLua::getBoolVectorFromTable(const char *variable) {
   vector<bool> res;
-  lua_getfield(_state, _idx, variable);
+  lua_getfield(_state, -1, variable);
   if (lua_istable(_state, -1)) {
-    _idx--;
-    for (int idx = 1; lua_geti(_state, -idx, idx); idx++) {
+    //_idx--;
+    for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
       // Always push the first value to top
       if (lua_isboolean(_state, -1)) {
-        _idx--;
+        //_idx--;
         res.push_back(lua_toboolean(_state, -1));
+        lua_pop(_state, 1);
       } else
         throw LuaException("The top stack variable is not an integer.");
     }
   } else
     throw LuaException(lua_tostring(_state, -1));
-  lua_pop(_state, 1);
+  lua_pop(_state, 2);
   return res;
 }
 vector<string> LittleLua::getStringVectorFromTable(const char *variable) {
   vector<string> res;
-  lua_getfield(_state, _idx, variable);
-  if (lua_istable(_state, 1)) {
-    _idx--;
-    for (int idx = 1; lua_geti(_state, -idx, idx); idx++) {
+  lua_getfield(_state, -1, variable);
+  if (lua_istable(_state, -1)) {
+    //_idx--;
+    for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
       // Always push the first value to top
       if (lua_isstring(_state, -1)) {
-        _idx--;
+        //_idx--;
         res.push_back(lua_tostring(_state, -1));
+        lua_pop(_state, 1);
       } else
         throw LuaException("The top stack variable is not an integer.");
     }
   } else
     throw LuaException(lua_tostring(_state, -1));
-  lua_pop(_state, 1);
+  lua_pop(_state, 2);
   return res;
 }
 

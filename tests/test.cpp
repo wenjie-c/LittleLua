@@ -94,10 +94,14 @@ TEST(LuaTest, TableTest) {
     cout << i << " : " << cities.at(i) << endl;
   }
 
+  
+
   ASSERT_TRUE(name.compare("Alan") == 0);
   ASSERT_TRUE(surname.compare("Donnor") == 0);
   ASSERT_EQ(age, 67);
   ASSERT_EQ(weight, 69.5f);
+
+  //lua.dumpstack();
 
   lua.close();
 }
