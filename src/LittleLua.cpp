@@ -1,6 +1,7 @@
 #include <LittleLua.hpp>
 
-// TODO Change the implementation to pop everytime that a value is obtained, but keeping the table referenced. It is important to not overflow LUA_MINSTACK
+// TODO Change the implementation to pop everytime that a value is obtained, but
+// keeping the table referenced. It is important to not overflow LUA_MINSTACK
 
 void LittleLua::init() {
   _state = luaL_newstate();
@@ -312,6 +313,53 @@ void LittleLua::setStringFromTable(const char *name, const char *value) {
   lua_pushstring(_state, value);
   //--_idx;
   lua_setfield(_state, -2, name);
+}
+
+void LittleLua::setStringFromTable(const char *name, const string value) {
+  setStringFromTable(name, value.c_str());
+}
+
+void LittleLua::setIntegerVector(const char *name, const vector<int> integers) {
+  lua_newtable(_state);
+  for (size_t i = 0; i < integers.size(); i++) {
+    lua_pushinteger(_state, i + 1); // index on lua starts in 1
+    lua_pushinteger(_state, integers[i]);
+    lua_settable(_state, -3);
+  }
+
+  lua_setglobal(_state, name);
+}
+void LittleLua::setNumberVector(const char *name,
+                                const vector<double> doubles) {
+  lua_newtable(_state);
+  for (size_t i = 0; i < doubles.size(); i++) {
+    lua_pushnumber(_state, i + 1); // index on lua starts in 1
+    lua_pushnumber(_state, doubles[i]);
+    lua_settable(_state, -3);
+  }
+
+  lua_setglobal(_state, name);
+}
+void LittleLua::setBoolVector(const char *name, const vector<bool> bools) {
+  lua_newtable(_state);
+  for (size_t i = 0; i < bools.size(); i++) {
+    lua_pushboolean(_state, i + 1); // index on lua starts in 1
+    lua_pushboolean(_state, bools[i]);
+    lua_settable(_state, -3);
+  }
+
+  lua_setglobal(_state, name);
+}
+void LittleLua::setStringVector(const char *name,
+                                const vector<string> strings) {
+  lua_newtable(_state);
+  for (size_t i = 0; i < strings.size(); i++) {
+    lua_pushinteger(_state, i + 1); // index on lua starts in 1
+    lua_pushstring(_state, strings[i].c_str());
+    lua_settable(_state, -3);
+  }
+
+  lua_setglobal(_state, name);
 }
 
 #pragma endregion setters

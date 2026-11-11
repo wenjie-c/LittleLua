@@ -141,6 +141,20 @@ TEST(LuaTest, TableSetterTest) {
   lua.close();
 }
 
+TEST(LuaTest, setArrayTest)
+{
+  const char * code1 = "for i = 1, #numbers do\n  print(numbers[i])\nend";
+  const char * code2 = "for i = 1, #foods do\n  print(foods[i])\nend";
+
+  LittleLua lua;
+  lua.init();
+  ASSERT_NO_THROW(lua.setIntegerVector("numbers", {1,3,5,7,12,1}));
+  ASSERT_NO_THROW(lua.setStringVector("foods", {"bread","burguer","pasta","salad"}));
+  ASSERT_NO_THROW(lua.execute(code1));
+  ASSERT_NO_THROW(lua.execute(code2));
+  lua.close();
+}
+
 // This only works if "more" were a global variable, but it is a field from this
 // table.
 /* TEST(LuaTest, Table2Test) {

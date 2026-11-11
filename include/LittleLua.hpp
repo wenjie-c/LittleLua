@@ -53,7 +53,6 @@ public:
   bool getBoolFromTable(const char *variable);
   string getStringFromTable(const char *variable);
 
-  // TODO finish these getters
   vector<int> getIntegerVectorFromTable(const char *variable);
   vector<double> getNumberVectorFromTable(const char *variable);
   vector<bool> getBoolVectorFromTable(const char *variable);
@@ -69,10 +68,17 @@ public:
   void setString(const char *name, const char *value);
   void setString(const char *name, const string value);
 
+  void setIntegerVector(const char *name, const vector<int> integers);
+  void setNumberVector(const char *name, const vector<double> doubles);
+  void setBoolVector(const char *name, const vector<bool> bools);
+  void setStringVector(const char *name, const vector<string> strings);
+
   void setIntegerFromTable(const char *name, const int value);
   void setNumberFromTable(const char *name, const double value);
   void setBoolFromTable(const char *name, const bool value);
   void setStringFromTable(const char *name, const char *value);
+  void setStringFromTable(const char *name, const string value);
+
 #pragma endregion setters
 
   template <typename T> T deserializate(const char *variable);
