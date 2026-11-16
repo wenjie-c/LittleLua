@@ -1,7 +1,5 @@
 #include <LittleLua.hpp>
 
-
-
 void LittleLua::init() {
   _state = luaL_newstate();
   if (!_state)
@@ -31,6 +29,20 @@ void LittleLua::executeFile(const char *path, Callback _postOperation) {
     // luaL_error(_state, "Error: %s\n", lua_tostring(_state, -1));
     throw LuaException(lua_tostring(_state, -1));
   }
+}
+
+void LittleLua::openTable(const char *variable) {
+  _idx = -1;
+  lua_getglobal(_state, variable);
+  if (lua_istable(_state, _idx)) {
+    //--_idx; // tracking the table
+  } else
+    throw LuaException("Couldn't open the table, it is not a table.");
+}
+
+void LittleLua::closeTable() {
+  lua_pop(_state, 1);
+  _idx = 0;
 }
 
 #pragma region getters
@@ -108,7 +120,7 @@ vector<double> LittleLua::getNumberVector(const char *variable) {
   } else
     // throw LuaException("The top stack variable is not an array or a table.");
     throw LuaException(lua_tostring(_state, -1));
-    lua_pop(_state, 2);
+  lua_pop(_state, 2);
   return res;
 }
 vector<bool> LittleLua::getBoolVector(const char *variable) {
@@ -127,7 +139,7 @@ vector<bool> LittleLua::getBoolVector(const char *variable) {
   } else
     // throw LuaException("The top stack variable is not an array or a table.");
     throw LuaException(lua_tostring(_state, -1));
-    lua_pop(_state, 2);
+  lua_pop(_state, 2);
   return res;
 }
 vector<string> LittleLua::getStringVector(const char *variable) {
@@ -146,18 +158,10 @@ vector<string> LittleLua::getStringVector(const char *variable) {
   } else
     // throw LuaException("The top stack variable is not an array or a table.");
     throw LuaException(lua_tostring(_state, -1));
-    lua_pop(_state, 2);
+  lua_pop(_state, 2);
   return res;
 }
 
-void LittleLua::openTable(const char *variable) {
-  _idx = -1;
-  lua_getglobal(_state, variable);
-  if (lua_istable(_state, _idx)) {
-    //--_idx; // tracking the table
-  } else
-    throw LuaException("Couldn't open the table, it is not a table.");
-}
 int LittleLua::getIntegerFromTable(const char *variable) {
   lua_getfield(_state, -1, variable);
   if (lua_isinteger(_state, -1)) {
@@ -167,7 +171,7 @@ int LittleLua::getIntegerFromTable(const char *variable) {
     return value;
   } else
     throw LuaException(lua_tostring(_state, -1));
-    lua_pop(_state, 1);
+  lua_pop(_state, 1);
   return 0;
 }
 
@@ -180,7 +184,7 @@ double LittleLua::getNumberFromTable(const char *variable) {
     return value;
   } else
     throw LuaException(lua_tostring(_state, -1));
-    lua_pop(_state, 1);
+  lua_pop(_state, 1);
   return 0;
 }
 
@@ -193,7 +197,7 @@ bool LittleLua::getBoolFromTable(const char *variable) {
     return value;
   } else
     throw LuaException(lua_tostring(_state, -1));
-    lua_pop(_state, 1);
+  lua_pop(_state, 1);
   return false;
 }
 string LittleLua::getStringFromTable(const char *variable) {
@@ -205,7 +209,7 @@ string LittleLua::getStringFromTable(const char *variable) {
     return value;
   } else
     LuaException(lua_tostring(_state, -1));
-    lua_pop(_state, 1);
+  lua_pop(_state, 1);
   return string("");
 }
 
@@ -391,6 +395,51 @@ void LittleLua::setStringVector(const char *name,
   }
 
   lua_setglobal(_state, name);
+}
+
+void LittleLua::setIntegerVectorFromTable(const char *name,
+                                          const vector<int> value) {
+  lua_newtable(_state);
+  for (size_t i = 0; i < value.size(); i++) {
+    lua_pushinteger(_state, i + 1); // index on lua starts in 1
+    lua_pushinteger(_state, value[i]);
+    lua_settable(_state, -3);
+  }
+
+  lua_setfield(_state, -2, name);
+}
+void LittleLua::setNumberVectorFromTable(const char *name,
+                                         const vector<double> value) {
+  lua_newtable(_state);
+  for (size_t i = 0; i < value.size(); i++) {
+    lua_pushinteger(_state, i + 1); // index on lua starts in 1
+    lua_pushnumber(_state, value[i]);
+    lua_settable(_state, -3);
+  }
+
+  lua_setfield(_state, -2, name);
+}
+void LittleLua::setBoolVectorFromTable(const char *name,
+                                       const vector<bool> value) {
+  lua_newtable(_state);
+  for (size_t i = 0; i < value.size(); i++) {
+    lua_pushinteger(_state, i + 1); // index on lua starts in 1
+    lua_pushboolean(_state, value[i]);
+    lua_settable(_state, -3);
+  }
+
+  lua_setfield(_state, -2, name);
+}
+void LittleLua::setStringVectorFromTable(const char *name,
+                                         const vector<string> value) {
+  lua_newtable(_state);
+  for (size_t i = 0; i < value.size(); i++) {
+    lua_pushinteger(_state, i + 1); // index on lua starts in 1
+    lua_pushstring(_state, value[i].c_str());
+    lua_settable(_state, -3);
+  }
+
+  lua_setfield(_state, -2, name);
 }
 
 #pragma endregion setters

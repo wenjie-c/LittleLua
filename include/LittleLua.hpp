@@ -29,6 +29,19 @@ public:
   void execute(const string code, Callback _postOperation = NULL);
   void executeFile(const char *path, Callback _postOperation = NULL);
 
+  /**
+   * @brief Step into a lua table, the internal _idx used to track it. 
+   *
+   * @param variable The name of the table
+   */
+  void openTable(const char *variable);
+
+  /**
+   * @brief Step out from a lua table.
+   * 
+   */
+  void closeTable();
+
 #pragma region getters
 
   int getInteger(const char *variable);
@@ -41,13 +54,6 @@ public:
   vector<bool> getBoolVector(const char *variable);
   vector<string> getStringVector(const char *variable);
 
-  /**
-   * @brief Get into a lua table, the internal _idx is going to track it. It
-   * only reaches 1 depth level.
-   *
-   * @param variable The name of the table
-   */
-  void openTable(const char *variable);
   int getIntegerFromTable(const char *variable);
   double getNumberFromTable(const char *variable);
   bool getBoolFromTable(const char *variable);
@@ -78,6 +84,11 @@ public:
   void setBoolFromTable(const char *name, const bool value);
   void setStringFromTable(const char *name, const char *value);
   void setStringFromTable(const char *name, const string value);
+
+  void setIntegerVectorFromTable(const char *name, const vector<int> value);
+  void setNumberVectorFromTable(const char *name, const vector<double> value);
+  void setBoolVectorFromTable(const char *name, const vector<bool> value);
+  void setStringVectorFromTable(const char *name, const vector<string> value);
 
 #pragma endregion setters
 

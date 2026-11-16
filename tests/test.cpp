@@ -149,6 +149,8 @@ TEST(LuaTest, setArrayTest)
 {
   const char * code1 = "for i = 1, #numbers do\n  print(numbers[i])\nend";
   const char * code2 = "for i = 1, #foods do\n  print(foods[i])\nend";
+  const char * code3 = "for i = 1, #things.cities do\n  print(things.cities[i])\nend";
+  const char * code4 = "for i = 1, #things.real do\n  print(things.real[i])\nend";
 
   LittleLua lua;
   lua.init();
@@ -156,6 +158,14 @@ TEST(LuaTest, setArrayTest)
   ASSERT_NO_THROW(lua.setStringVector("foods", {"bread","burguer","pasta","salad"}));
   ASSERT_NO_THROW(lua.execute(code1));
   ASSERT_NO_THROW(lua.execute(code2));
+  ASSERT_NO_THROW(lua.executeFile(path5));
+  lua.openTable("things");
+  ASSERT_NO_THROW(lua.setStringVectorFromTable("cities", {"Barcelona", "Madrid", "Valencia", "Seville", "Bilbao"})); // changing time
+  ASSERT_NO_THROW(lua.setNumberVectorFromTable("real", {4.2f, 6.7f, 1.999f, 8.88888f}));
+  ASSERT_NO_THROW(lua.execute(code3));
+  ASSERT_NO_THROW(lua.execute(code4));
+  lua.closeTable();
+  lua.dumpstack(); // It mus remain empty
   lua.close();
 }
 
