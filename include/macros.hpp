@@ -114,8 +114,31 @@ extern "C" {
   /**
    * @brief Deserialize constructor definition
    * @param lua Internal lua_State pointer.
-   * @param idx Internal stack index to know where is the table.
    */
 #define  LITTLELUA_DESERIALIZE_CONSTRUCTOR(Type) Type(lua_State * lua)
+
+/**
+ * @brief Alternative to deserialization constructor using a method. You need an empty constructor anyways.
+ * 
+ */
+#define LITTLELUA_DESERIALIZE_METHOD(Type) void fromLua(lua_State * lua)
+
+// TODO Finish serialize macros
+#define LITTLELUA_SERIALIZE_INTEGER_MEMBER(x) lua_pushinteger(lua, x); \
+                                             lua_setfield(lua, -2,#x);
+
+#define LITTLELUA_SERIALIZE_DOUBLE_MEMBER(x) lua_pushnumber(lua, x); \
+                                             lua_setfield(lua, -2,#x);
+
+#define LITTLELUA_SERIALIZE_BOOL_MEMBER(x) lua_pushboolean(lua, x); \
+                                             lua_setfield(lua, -2,#x);
+
+#define LITTLELUA_SERIALIZE_CSTRING_MEMBER(x) lua_pushstring(lua, x); \
+                                             lua_setfield(lua, -2,#x);
+
+#define LITTLELUA_SERIALIZE_STRING_MEMBER(x) lua_pushstring(lua, x.c_str()); \
+                                             lua_setfield(lua, -2,#x);
+
+#define LITTLELUA_SERIALIZE void toLua(lua_State * lua)
 
 #pragma endregion Macros

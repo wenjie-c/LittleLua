@@ -5,10 +5,14 @@
 #include <macros.hpp>
 using namespace std;
 
-
+/**
+ * @brief An example class to show how serialization/deserialization works.
+ * 
+ */
 class Settings : public ILuaSerializable {
     public:
     Settings() {}
+    Settings(int w, int h, bool d, string t) :width(w), height(h), debug(d), title(t) {}
     LITTLELUA_DESERIALIZE_CONSTRUCTOR(Settings) {
         //LITTLELUA_DESERIALIZE_INIT()
         LITTLELUA_DESERIALIZE_INT_MEMBER(width)
@@ -33,5 +37,12 @@ class Settings : public ILuaSerializable {
         LITTLELUA_DESERIALIZE_INT_MEMBER(height)
         LITTLELUA_DESERIALIZE_BOOL_MEMBER(debug)
         LITTLELUA_DESERIALIZE_STRING_MEMBER(title)
+    }
+
+    LITTLELUA_SERIALIZE {
+        LITTLELUA_SERIALIZE_INTEGER_MEMBER(width)
+        LITTLELUA_SERIALIZE_INTEGER_MEMBER(height)
+        LITTLELUA_SERIALIZE_BOOL_MEMBER(debug)
+        LITTLELUA_SERIALIZE_STRING_MEMBER(title)
     }
 };

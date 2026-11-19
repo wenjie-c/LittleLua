@@ -90,9 +90,30 @@ public:
   void setBoolVectorFromTable(const char *name, const vector<bool> value);
   void setStringVectorFromTable(const char *name, const vector<string> value);
 
+  /**
+   * @brief Create a Table object from scratch
+   * 
+   * @param variable 
+   */
+  void createTable(const char * variable);
+
 #pragma endregion setters
 
+  /**
+   * @brief Deserialize an object with LITTLELUA_SERIALIZE_CONSTRUCTOR macro implemented
+   * 
+   * @tparam T 
+   * @param variable Input Table name in Lua
+   * @return T 
+   */
   template <typename T> T deserializate(const char *variable);
+
+  /**
+   * @brief Serialize an object with LITTLELUA_SERIALIZE_METHOD macro implemented
+   * 
+   * @param variable Output Table name to Lua
+   */
+  template <typename T> void serialize(const char * variable, T& object);
 
   ~LittleLua() {
     if (!_state)

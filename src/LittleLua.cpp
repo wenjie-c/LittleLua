@@ -45,6 +45,13 @@ void LittleLua::closeTable() {
   _idx = 0;
 }
 
+template <typename T>
+void LittleLua::serialize(const char * variable, T& object) {
+  lua_newtable(_state);
+  object.toLua(_state);
+  lua_setglobal(_state, variable);
+}
+
 #pragma region getters
 
 int LittleLua::getInteger(const char *variable) {
@@ -440,6 +447,11 @@ void LittleLua::setStringVectorFromTable(const char *name,
   }
 
   lua_setfield(_state, -2, name);
+}
+
+void LittleLua::createTable(const char * variable) {
+  lua_newtable(_state);
+  lua_setglobal(_state, variable);
 }
 
 #pragma endregion setters

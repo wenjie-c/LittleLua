@@ -169,6 +169,19 @@ TEST(LuaTest, setArrayTest)
   lua.close();
 }
 
+TEST(LuaTest, SerializeTest)
+{
+  const char * code1 = "print(\"Width: \" .. mySettings.width)\nprint(\"Height: \" .. mySettings.height)\nprint(\"Debug: \" .. tostring(mySettings.debug))\nprint(\"Title: \" .. mySettings.title)";
+
+  LittleLua lua;
+  lua.init();
+  
+  Settings setting(800,600,true,"Serialization");
+  ASSERT_NO_THROW(lua.serialize<Settings>("mySettings", setting));
+  ASSERT_NO_THROW(lua.execute(code1));
+  lua.close();
+}
+
 // This only works if "more" were a global variable, but it is a field from this
 // table.
 /* TEST(LuaTest, Table2Test) {
