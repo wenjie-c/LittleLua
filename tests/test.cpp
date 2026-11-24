@@ -13,6 +13,7 @@ const char *path2 = "example2.lua";
 const char *path3 = "example3.lua";
 const char *path4 = "example4.lua";
 const char *path5 = "example5.lua";
+const char *path6 = "example6.lua";
 
 TEST(LuaTest, PrintTest) {
   LittleLua lua;
@@ -53,7 +54,7 @@ TEST(LuaTest, GetterArrayTest) {
     cout << i << " : " << fruits.at(i) << endl;
   }
 
-  //lua.dumpstack();
+  // lua.dumpstack();
 
   lua.close();
 }
@@ -80,28 +81,26 @@ TEST(LuaTest, TableTest) {
   ASSERT_NO_THROW(age = lua.getIntegerFromTable("age"));
   ASSERT_NO_THROW(weight = lua.getNumberFromTable("weight"));
 
-  //lua.dumpstack();
+  // lua.dumpstack();
 
   ASSERT_NO_THROW(numbers = lua.getNumberVectorFromTable("real"));
   for (int i = 0; i < numbers.size(); i++) {
     cout << i << " : " << numbers.at(i) << endl;
   }
 
-  //lua.dumpstack();
+  // lua.dumpstack();
 
   ASSERT_NO_THROW(cities = lua.getStringVectorFromTable("cities"));
   for (int i = 0; i < cities.size(); i++) {
     cout << i << " : " << cities.at(i) << endl;
   }
 
-  
-
   ASSERT_TRUE(name.compare("Alan") == 0);
   ASSERT_TRUE(surname.compare("Donnor") == 0);
   ASSERT_EQ(age, 67);
   ASSERT_EQ(weight, 69.5f);
 
-  //lua.dumpstack();
+  // lua.dumpstack();
 
   lua.close();
 }
@@ -145,23 +144,28 @@ TEST(LuaTest, TableSetterTest) {
   lua.close();
 }
 
-TEST(LuaTest, setArrayTest)
-{
-  const char * code1 = "for i = 1, #numbers do\n  print(numbers[i])\nend";
-  const char * code2 = "for i = 1, #foods do\n  print(foods[i])\nend";
-  const char * code3 = "for i = 1, #things.cities do\n  print(things.cities[i])\nend";
-  const char * code4 = "for i = 1, #things.real do\n  print(things.real[i])\nend";
+TEST(LuaTest, setArrayTest) {
+  const char *code1 = "for i = 1, #numbers do\n  print(numbers[i])\nend";
+  const char *code2 = "for i = 1, #foods do\n  print(foods[i])\nend";
+  const char *code3 =
+      "for i = 1, #things.cities do\n  print(things.cities[i])\nend";
+  const char *code4 =
+      "for i = 1, #things.real do\n  print(things.real[i])\nend";
 
   LittleLua lua;
   lua.init();
-  ASSERT_NO_THROW(lua.setIntegerVector("numbers", {1,3,5,7,12,1}));
-  ASSERT_NO_THROW(lua.setStringVector("foods", {"bread","burguer","pasta","salad"}));
+  ASSERT_NO_THROW(lua.setIntegerVector("numbers", {1, 3, 5, 7, 12, 1}));
+  ASSERT_NO_THROW(
+      lua.setStringVector("foods", {"bread", "burguer", "pasta", "salad"}));
   ASSERT_NO_THROW(lua.execute(code1));
   ASSERT_NO_THROW(lua.execute(code2));
   ASSERT_NO_THROW(lua.executeFile(path5));
   lua.openTable("things");
-  ASSERT_NO_THROW(lua.setStringVectorFromTable("cities", {"Barcelona", "Madrid", "Valencia", "Seville", "Bilbao"})); // changing time
-  ASSERT_NO_THROW(lua.setNumberVectorFromTable("real", {4.2f, 6.7f, 1.999f, 8.88888f}));
+  ASSERT_NO_THROW(lua.setStringVectorFromTable(
+      "cities", {"Barcelona", "Madrid", "Valencia", "Seville",
+                 "Bilbao"})); // changing time
+  ASSERT_NO_THROW(
+      lua.setNumberVectorFromTable("real", {4.2f, 6.7f, 1.999f, 8.88888f}));
   ASSERT_NO_THROW(lua.execute(code3));
   ASSERT_NO_THROW(lua.execute(code4));
   lua.closeTable();
@@ -169,17 +173,72 @@ TEST(LuaTest, setArrayTest)
   lua.close();
 }
 
-TEST(LuaTest, SerializeTest)
-{
-  const char * code1 = "print(\"Width: \" .. mySettings.width)\nprint(\"Height: \" .. mySettings.height)\nprint(\"Debug: \" .. tostring(mySettings.debug))\nprint(\"Title: \" .. mySettings.title)";
+TEST(LuaTest, SerializeTest) {
+  const char *code1 =
+      "print(\"Width: \" .. mySettings.width)\nprint(\"Height: \" .. "
+      "mySettings.height)\nprint(\"Debug: \" .. "
+      "tostring(mySettings.debug))\nprint(\"Title: \" .. mySettings.title)";
 
   LittleLua lua;
   lua.init();
-  
-  Settings setting(800,600,true,"Serialization");
+
+  Settings setting(800, 600, true, "Serialization");
   ASSERT_NO_THROW(lua.serialize<Settings>("mySettings", setting));
   ASSERT_NO_THROW(lua.execute(code1));
   lua.close();
+}
+
+TEST(LuaTest, LuaToCFunctionTest)
+{
+
+  constexpr int a = 3;
+  constexpr int b = 4;
+  constexpr int n = 15;
+  constexpr char firstName[] = "Juan\0";
+  constexpr char middleName[] = "Carlos\0";
+  constexpr char lastName[] = "Borbón\0";
+  int res1 = 0;
+  int res2 = 0;
+  string res3;
+
+  LittleLua lua;
+  lua.init();
+
+  ASSERT_NO_THROW(lua.executeFile(path6));
+  ASSERT_NO_THROW(
+    res1 = lua.LUA_INT_FUNCTION_BEGIN(sum)
+    LUA_ARG_INT(3)
+    LUA_ARG_INT(4)
+    LUA_FUNCTION_END
+  );
+
+  ASSERT_NO_THROW(
+    res1 = lua.LUA_INT_FUNCTION_BEGIN(sum)
+    LUA_ARG_INT(3)
+    LUA_ARG_INT(4)
+    LUA_FUNCTION_END
+  );
+
+  ASSERT_NO_THROW(
+    res2 = lua.LUA_INT_FUNCTION_BEGIN(fibonacci)
+    LUA_ARG_INT(n)
+    LUA_FUNCTION_END
+  );
+
+  ASSERT_NO_THROW(
+    res3 = lua.LUA_STRING_FUNCTION_BEGIN(concat)
+    LUA_ARG_STRING(firstName)
+    LUA_ARG_STRING(middleName)
+    LUA_ARG_STRING(lastName)
+    LUA_FUNCTION_END
+  );
+
+  ASSERT_EQ(res1, 7);
+  cout << "Concat result is " << res3 << endl;
+
+  lua.close();
+
+
 }
 
 // This only works if "more" were a global variable, but it is a field from this

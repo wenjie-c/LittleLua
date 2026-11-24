@@ -1,7 +1,10 @@
 #include <LuaException.hpp>
 #include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <iostream>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <vector>
 
@@ -30,7 +33,7 @@ public:
   void executeFile(const char *path, Callback _postOperation = NULL);
 
   /**
-   * @brief Step into a lua table, the internal _idx used to track it. 
+   * @brief Step into a lua table, the internal _idx used to track it.
    *
    * @param variable The name of the table
    */
@@ -38,7 +41,7 @@ public:
 
   /**
    * @brief Step out from a lua table.
-   * 
+   *
    */
   void closeTable();
 
@@ -92,28 +95,157 @@ public:
 
   /**
    * @brief Create a Table object from scratch
-   * 
-   * @param variable 
+   *
+   * @param variable
    */
-  void createTable(const char * variable);
+  void createTable(const char *variable);
 
 #pragma endregion setters
 
   /**
-   * @brief Deserialize an object with LITTLELUA_SERIALIZE_CONSTRUCTOR macro implemented
-   * 
-   * @tparam T 
+   * @brief Deserialize an object with LITTLELUA_SERIALIZE_CONSTRUCTOR macro
+   * implemented
+   *
+   * @tparam T
    * @param variable Input Table name in Lua
-   * @return T 
+   * @return T
    */
   template <typename T> T deserializate(const char *variable);
 
   /**
-   * @brief Serialize an object with LITTLELUA_SERIALIZE_METHOD macro implemented
-   * 
+   * @brief Serialize an object with LITTLELUA_SERIALIZE_METHOD macro
+   * implemented
+   *
    * @param variable Output Table name to Lua
    */
-  template <typename T> void serialize(const char * variable, T& object);
+  template <typename T> void serialize(const char *variable, T &object);
+
+#pragma region functional
+
+  /**
+   * @brief Call a lua void function with variable arguments.
+   *
+   * @tparam argTypes
+   * @param functionName
+   * @param argList A function pointer to set all the arguments in order, it
+   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   */
+  template <class... argTypes>
+  void callFunction(const char *functionName,
+                    function<size_t(argTypes...)> argList) {
+    lua_getglobal(_state, functionName);
+    if (lua_isfunction(_state, -1)) {
+      size_t argCount = argList();
+      int status = lua_pcall(_state, argCount, 0, 0); // nothing to return
+
+      _functionStatusHandler(status);
+
+    } else {
+      throw LuaException("Couldn't find the lua function.");
+    }
+  }
+
+  /**
+   * @brief Call a lua integer function with variable arguments.
+   *
+   * @param functionName
+   * @param argList A function pointer to set all the arguments in order, it
+   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   */
+  int callIntegerFunction(const char *functionName,
+                          function<size_t(lua_State *)> argList) {
+    lua_getglobal(_state, functionName);
+    if (lua_isfunction(_state, -1)) {
+      size_t argCount = argList(_state);
+      int status = lua_pcall(_state, argCount, 1, 0);
+
+      _functionStatusHandler(status);
+
+      return lua_tointeger(_state, -1);
+
+    } else {
+      throw LuaException("Couldn't find the lua function.");
+    }
+
+    return INT32_MIN;
+  }
+
+  /**
+   * @brief Call a lua double function with variable arguments.
+   *
+   * @param functionName
+   * @param argList A function pointer to set all the arguments in order, it
+   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   */
+  double callNumberFunction(const char *functionName,
+                            function<size_t(lua_State *)> argList) {
+    lua_getglobal(_state, functionName);
+    if (lua_isfunction(_state, -1)) {
+      size_t argCount = argList(_state);
+      int status = lua_pcall(_state, argCount, 1, 0);
+
+      _functionStatusHandler(status);
+
+      return lua_tonumber(_state, -1);
+
+    } else {
+      throw LuaException("Couldn't find the lua function.");
+    }
+
+    return INT32_MIN;
+  }
+
+  /**
+   * @brief Call a lua bool function with variable arguments.
+   *
+   * @param functionName
+   * @param argList A function pointer to set all the arguments in order, it
+   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   */
+  bool callBoolFunction(const char *functionName,
+                        function<size_t(lua_State *)> argList) {
+    lua_getglobal(_state, functionName);
+    if (lua_isfunction(_state, -1)) {
+      size_t argCount = argList(_state);
+      int status = lua_pcall(_state, argCount, 1, 0);
+
+      _functionStatusHandler(status);
+
+      return lua_toboolean(_state, -1);
+
+    } else {
+      throw LuaException("Couldn't find the lua function.");
+    }
+
+    return false;
+  }
+
+  /**
+   * @brief Call a lua string function with variable arguments.
+   *
+   * @param functionName
+   * @param argList A function pointer to set all the arguments in order, it
+   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   */
+  string callStringFunction(const char *functionName,
+                            function<size_t(lua_State *)> argList) {
+    lua_getglobal(_state, functionName);
+    if (lua_isfunction(_state, -1)) {
+      size_t argCount = argList(_state);
+      int status = lua_pcall(_state, argCount, 1, 0);
+
+      _functionStatusHandler(status);
+
+      return lua_tostring(_state, -1);
+
+    } else {
+      throw LuaException("Couldn't find the lua function.");
+    }
+
+    return "";
+  }
+
+#pragma endregion functional
 
   ~LittleLua() {
     if (!_state)
@@ -149,6 +281,14 @@ private:
 #pragma region LittleLua_VARIABLES
   lua_State *_state;
   int _idx = -1;
+
+  /**
+   * @brief Identifies and throws exception if an error status happens
+   *
+   * @param status
+   */
+  void _functionStatusHandler(int status);
+
 #pragma endregion LittleLua_VARIABLES
 };
 #endif // LittleLua_HPP

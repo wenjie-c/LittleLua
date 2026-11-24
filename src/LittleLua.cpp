@@ -1,4 +1,5 @@
 #include <LittleLua.hpp>
+#include <cstdarg>
 
 void LittleLua::init() {
   _state = luaL_newstate();
@@ -46,7 +47,7 @@ void LittleLua::closeTable() {
 }
 
 template <typename T>
-void LittleLua::serialize(const char * variable, T& object) {
+void LittleLua::serialize(const char *variable, T &object) {
   lua_newtable(_state);
   object.toLua(_state);
   lua_setglobal(_state, variable);
@@ -449,9 +450,29 @@ void LittleLua::setStringVectorFromTable(const char *name,
   lua_setfield(_state, -2, name);
 }
 
-void LittleLua::createTable(const char * variable) {
+void LittleLua::createTable(const char *variable) {
   lua_newtable(_state);
   lua_setglobal(_state, variable);
 }
 
 #pragma endregion setters
+
+#pragma region functional
+void LittleLua::_functionStatusHandler(int status) {
+  if (status == LUA_OK) {
+    return;
+  }
+
+  if (status == LUA_ERRRUN)
+    throw LuaException("Runtime error on executing a lua function.");
+
+  if (status == LUA_ERRMEM)
+    throw LuaException("Failed to allocate memory.");
+
+  if (status == LUA_ERRERR)
+    throw LuaException("Failed to call the message handler.");
+
+  throw LuaException("Unknown Error.");
+  // unknown error
+}
+#pragma endregion functional
