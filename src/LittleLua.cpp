@@ -170,8 +170,8 @@ vector<string> LittleLua::getStringVector(const char *variable) {
   return res;
 }
 
-int LittleLua::getIntegerFromTable(const char *variable) {
-  lua_getfield(_state, -1, variable);
+int LittleLua::getIntegerFromTable(const char *member) {
+  lua_getfield(_state, -1, member);
   if (lua_isinteger(_state, -1)) {
     //_idx--; // tracking the table
     auto value = lua_tointeger(_state, -1);
@@ -183,8 +183,8 @@ int LittleLua::getIntegerFromTable(const char *variable) {
   return 0;
 }
 
-double LittleLua::getNumberFromTable(const char *variable) {
-  lua_getfield(_state, -1, variable);
+double LittleLua::getNumberFromTable(const char *member) {
+  lua_getfield(_state, -1, member);
   if (lua_isnumber(_state, -1)) {
     //_idx--; // tracking the table
     auto value = lua_tonumber(_state, -1);
@@ -196,8 +196,8 @@ double LittleLua::getNumberFromTable(const char *variable) {
   return 0;
 }
 
-bool LittleLua::getBoolFromTable(const char *variable) {
-  lua_getfield(_state, -1, variable);
+bool LittleLua::getBoolFromTable(const char *member) {
+  lua_getfield(_state, -1, member);
   if (lua_isboolean(_state, -1)) {
     //_idx--; // tracking the table
     auto value = lua_toboolean(_state, -1);
@@ -208,8 +208,8 @@ bool LittleLua::getBoolFromTable(const char *variable) {
   lua_pop(_state, 1);
   return false;
 }
-string LittleLua::getStringFromTable(const char *variable) {
-  lua_getfield(_state, -1, variable);
+string LittleLua::getStringFromTable(const char *member) {
+  lua_getfield(_state, -1, member);
   if (lua_isstring(_state, -1)) {
     //_idx--; // tracking the table
     auto value = lua_tostring(_state, -1);
@@ -232,9 +232,9 @@ template <typename T> T LittleLua::deserializate(const char *variable) {
   return T(_state);
 }
 
-vector<int> LittleLua::getIntegerVectorFromTable(const char *variable) {
+vector<int> LittleLua::getIntegerVectorFromTable(const char *member) {
   vector<int> res;
-  lua_getfield(_state, -1, variable);
+  lua_getfield(_state, -1, member);
   if (lua_istable(_state, -1)) {
     //_idx--;
     for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
@@ -254,9 +254,9 @@ vector<int> LittleLua::getIntegerVectorFromTable(const char *variable) {
               // existent key, pushes a nil onto the top of the stack
   return res;
 }
-vector<double> LittleLua::getNumberVectorFromTable(const char *variable) {
+vector<double> LittleLua::getNumberVectorFromTable(const char *member) {
   vector<double> res;
-  lua_getfield(_state, -1, variable);
+  lua_getfield(_state, -1, member);
   if (lua_istable(_state, -1)) {
     //_idx--;
     for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
@@ -273,9 +273,9 @@ vector<double> LittleLua::getNumberVectorFromTable(const char *variable) {
   lua_pop(_state, 2);
   return res;
 }
-vector<bool> LittleLua::getBoolVectorFromTable(const char *variable) {
+vector<bool> LittleLua::getBoolVectorFromTable(const char *member) {
   vector<bool> res;
-  lua_getfield(_state, -1, variable);
+  lua_getfield(_state, -1, member);
   if (lua_istable(_state, -1)) {
     //_idx--;
     for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
@@ -292,9 +292,9 @@ vector<bool> LittleLua::getBoolVectorFromTable(const char *variable) {
   lua_pop(_state, 2);
   return res;
 }
-vector<string> LittleLua::getStringVectorFromTable(const char *variable) {
+vector<string> LittleLua::getStringVectorFromTable(const char *member) {
   vector<string> res;
-  lua_getfield(_state, -1, variable);
+  lua_getfield(_state, -1, member);
   if (lua_istable(_state, -1)) {
     //_idx--;
     for (int idx = 1; lua_geti(_state, -1, idx); idx++) {
@@ -315,54 +315,54 @@ vector<string> LittleLua::getStringVectorFromTable(const char *variable) {
 #pragma endregion getters
 
 #pragma region setters
-void LittleLua::setInteger(const char *name, const int value) {
+void LittleLua::setInteger(const char *variable, const int value) {
   lua_pushinteger(_state, value);
-  lua_setglobal(_state, name);
+  lua_setglobal(_state, variable);
 }
-void LittleLua::setNumber(const char *name, const double value) {
+void LittleLua::setNumber(const char *variable, const double value) {
   lua_pushnumber(_state, value);
-  lua_setglobal(_state, name);
+  lua_setglobal(_state, variable);
 }
-void LittleLua::setBool(const char *name, const bool value) {
+void LittleLua::setBool(const char *variable, const bool value) {
   lua_pushboolean(_state, value);
-  lua_setglobal(_state, name);
+  lua_setglobal(_state, variable);
 }
-void LittleLua::setString(const char *name, const char *value) {
+void LittleLua::setString(const char *variable, const char *value) {
   lua_pushstring(_state, value);
-  lua_setglobal(_state, name);
+  lua_setglobal(_state, variable);
 }
-void LittleLua::setString(const char *name, const string value) {
-  setString(name, value.c_str());
+void LittleLua::setString(const char *variable, const string value) {
+  setString(variable, value.c_str());
 }
 
-void LittleLua::setIntegerFromTable(const char *name, const int value) {
+void LittleLua::setIntegerFromTable(const char *member, const int value) {
   lua_pushinteger(_state, value);
   //--_idx;
   lua_setfield(_state, -2,
-               name); // idx is fixed on -2 because everytime that a value is
+               member); // idx is fixed on -2 because everytime that a value is
                       // setted, the value is popped out by lua
 }
-void LittleLua::setNumberFromTable(const char *name, const double value) {
+void LittleLua::setNumberFromTable(const char *member, const double value) {
   lua_pushnumber(_state, value);
   //--_idx;
-  lua_setfield(_state, -2, name);
+  lua_setfield(_state, -2, member);
 }
-void LittleLua::setBoolFromTable(const char *name, const bool value) {
+void LittleLua::setBoolFromTable(const char *member, const bool value) {
   lua_pushboolean(_state, value);
   //--_idx;
-  lua_setfield(_state, -2, name);
+  lua_setfield(_state, -2, member);
 }
-void LittleLua::setStringFromTable(const char *name, const char *value) {
+void LittleLua::setStringFromTable(const char *member, const char *value) {
   lua_pushstring(_state, value);
   //--_idx;
-  lua_setfield(_state, -2, name);
+  lua_setfield(_state, -2, member);
 }
 
-void LittleLua::setStringFromTable(const char *name, const string value) {
-  setStringFromTable(name, value.c_str());
+void LittleLua::setStringFromTable(const char *member, const string value) {
+  setStringFromTable(member, value.c_str());
 }
 
-void LittleLua::setIntegerVector(const char *name, const vector<int> integers) {
+void LittleLua::setIntegerVector(const char *variable, const vector<int> integers) {
   lua_newtable(_state);
   for (size_t i = 0; i < integers.size(); i++) {
     lua_pushinteger(_state, i + 1); // index on lua starts in 1
@@ -370,9 +370,9 @@ void LittleLua::setIntegerVector(const char *name, const vector<int> integers) {
     lua_settable(_state, -3);
   }
 
-  lua_setglobal(_state, name);
+  lua_setglobal(_state, variable);
 }
-void LittleLua::setNumberVector(const char *name,
+void LittleLua::setNumberVector(const char *variable,
                                 const vector<double> doubles) {
   lua_newtable(_state);
   for (size_t i = 0; i < doubles.size(); i++) {
@@ -381,9 +381,9 @@ void LittleLua::setNumberVector(const char *name,
     lua_settable(_state, -3);
   }
 
-  lua_setglobal(_state, name);
+  lua_setglobal(_state, variable);
 }
-void LittleLua::setBoolVector(const char *name, const vector<bool> bools) {
+void LittleLua::setBoolVector(const char *variable, const vector<bool> bools) {
   lua_newtable(_state);
   for (size_t i = 0; i < bools.size(); i++) {
     lua_pushboolean(_state, i + 1); // index on lua starts in 1
@@ -391,9 +391,9 @@ void LittleLua::setBoolVector(const char *name, const vector<bool> bools) {
     lua_settable(_state, -3);
   }
 
-  lua_setglobal(_state, name);
+  lua_setglobal(_state, variable);
 }
-void LittleLua::setStringVector(const char *name,
+void LittleLua::setStringVector(const char *variable,
                                 const vector<string> strings) {
   lua_newtable(_state);
   for (size_t i = 0; i < strings.size(); i++) {
@@ -402,10 +402,10 @@ void LittleLua::setStringVector(const char *name,
     lua_settable(_state, -3);
   }
 
-  lua_setglobal(_state, name);
+  lua_setglobal(_state, variable);
 }
 
-void LittleLua::setIntegerVectorFromTable(const char *name,
+void LittleLua::setIntegerVectorFromTable(const char *member,
                                           const vector<int> value) {
   lua_newtable(_state);
   for (size_t i = 0; i < value.size(); i++) {
@@ -414,9 +414,9 @@ void LittleLua::setIntegerVectorFromTable(const char *name,
     lua_settable(_state, -3);
   }
 
-  lua_setfield(_state, -2, name);
+  lua_setfield(_state, -2, member);
 }
-void LittleLua::setNumberVectorFromTable(const char *name,
+void LittleLua::setNumberVectorFromTable(const char *member,
                                          const vector<double> value) {
   lua_newtable(_state);
   for (size_t i = 0; i < value.size(); i++) {
@@ -425,9 +425,9 @@ void LittleLua::setNumberVectorFromTable(const char *name,
     lua_settable(_state, -3);
   }
 
-  lua_setfield(_state, -2, name);
+  lua_setfield(_state, -2, member);
 }
-void LittleLua::setBoolVectorFromTable(const char *name,
+void LittleLua::setBoolVectorFromTable(const char *member,
                                        const vector<bool> value) {
   lua_newtable(_state);
   for (size_t i = 0; i < value.size(); i++) {
@@ -436,9 +436,9 @@ void LittleLua::setBoolVectorFromTable(const char *name,
     lua_settable(_state, -3);
   }
 
-  lua_setfield(_state, -2, name);
+  lua_setfield(_state, -2, member);
 }
-void LittleLua::setStringVectorFromTable(const char *name,
+void LittleLua::setStringVectorFromTable(const char *member,
                                          const vector<string> value) {
   lua_newtable(_state);
   for (size_t i = 0; i < value.size(); i++) {
@@ -447,7 +447,7 @@ void LittleLua::setStringVectorFromTable(const char *name,
     lua_settable(_state, -3);
   }
 
-  lua_setfield(_state, -2, name);
+  lua_setfield(_state, -2, member);
 }
 
 void LittleLua::createTable(const char *variable) {

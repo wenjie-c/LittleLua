@@ -57,41 +57,41 @@ public:
   vector<bool> getBoolVector(const char *variable);
   vector<string> getStringVector(const char *variable);
 
-  int getIntegerFromTable(const char *variable);
-  double getNumberFromTable(const char *variable);
-  bool getBoolFromTable(const char *variable);
-  string getStringFromTable(const char *variable);
+  int getIntegerFromTable(const char *member);
+  double getNumberFromTable(const char *member);
+  bool getBoolFromTable(const char *member);
+  string getStringFromTable(const char *member);
 
-  vector<int> getIntegerVectorFromTable(const char *variable);
-  vector<double> getNumberVectorFromTable(const char *variable);
-  vector<bool> getBoolVectorFromTable(const char *variable);
-  vector<string> getStringVectorFromTable(const char *variable);
+  vector<int> getIntegerVectorFromTable(const char *member);
+  vector<double> getNumberVectorFromTable(const char *member);
+  vector<bool> getBoolVectorFromTable(const char *member);
+  vector<string> getStringVectorFromTable(const char *member);
 
 #pragma endregion getters
 
 // Use it before executing a file or code
 #pragma region setters
-  void setInteger(const char *name, const int value);
-  void setNumber(const char *name, const double value);
-  void setBool(const char *name, const bool value);
-  void setString(const char *name, const char *value);
-  void setString(const char *name, const string value);
+  void setInteger(const char *variable, const int value);
+  void setNumber(const char *variable, const double value);
+  void setBool(const char *variable, const bool value);
+  void setString(const char *variable, const char *value);
+  void setString(const char *variable, const string value);
 
-  void setIntegerVector(const char *name, const vector<int> integers);
-  void setNumberVector(const char *name, const vector<double> doubles);
-  void setBoolVector(const char *name, const vector<bool> bools);
-  void setStringVector(const char *name, const vector<string> strings);
+  void setIntegerVector(const char *variable, const vector<int> integers);
+  void setNumberVector(const char *variable, const vector<double> doubles);
+  void setBoolVector(const char *variable, const vector<bool> bools);
+  void setStringVector(const char *variable, const vector<string> strings);
 
-  void setIntegerFromTable(const char *name, const int value);
-  void setNumberFromTable(const char *name, const double value);
-  void setBoolFromTable(const char *name, const bool value);
-  void setStringFromTable(const char *name, const char *value);
-  void setStringFromTable(const char *name, const string value);
+  void setIntegerFromTable(const char *member, const int value);
+  void setNumberFromTable(const char *member, const double value);
+  void setBoolFromTable(const char *member, const bool value);
+  void setStringFromTable(const char *member, const char *value);
+  void setStringFromTable(const char *member, const string value);
 
-  void setIntegerVectorFromTable(const char *name, const vector<int> value);
-  void setNumberVectorFromTable(const char *name, const vector<double> value);
-  void setBoolVectorFromTable(const char *name, const vector<bool> value);
-  void setStringVectorFromTable(const char *name, const vector<string> value);
+  void setIntegerVectorFromTable(const char *member, const vector<int> value);
+  void setNumberVectorFromTable(const char *member, const vector<double> value);
+  void setBoolVectorFromTable(const char *member, const vector<bool> value);
+  void setStringVectorFromTable(const char *member, const vector<string> value);
 
   /**
    * @brief Create a Table object from scratch
