@@ -1,5 +1,6 @@
 #include <LittleLua.hpp>
 #include <cstdarg>
+#include <functional>
 
 void LittleLua::init() {
   _state = luaL_newstate();
@@ -312,6 +313,64 @@ vector<string> LittleLua::getStringVectorFromTable(const char *member) {
   return res;
 }
 
+void LittleLua::setVariable(const char *variable, const int value) {
+  setInteger(variable, value);
+}
+void LittleLua::setVariable(const char *variable, const double value) {
+  setNumber(variable, value);
+}
+void LittleLua::setVariable(const char *variable, const bool value) {
+  setBool(variable, value);
+}
+void LittleLua::setVariable(const char *variable, const char *value) {
+  setString(variable, value);
+}
+void LittleLua::setVariable(const char *variable, const string value) {
+  setString(variable, value);
+}
+void LittleLua::setVariable(const char *variable, const vector<int> integers) {
+  setIntegerVector(variable, integers);
+}
+void LittleLua::setVariable(const char *variable,
+                            const vector<double> doubles) {
+  setNumberVector(variable, doubles);
+}
+void LittleLua::setVariable(const char *variable, const vector<bool> bools) {
+  setBoolVector(variable, bools);
+}
+void LittleLua::setVariable(const char *variable,
+                            const vector<string> strings) {
+  setStringVector(variable, strings);
+}
+
+void LittleLua::setMember(const char *member, const int value) {
+  setIntegerFromTable(member, value);
+}
+void LittleLua::setMember(const char *member, const double value) {
+  setNumberFromTable(member, value);
+}
+void LittleLua::setMember(const char *member, const bool value) {
+  setBoolFromTable(member, value);
+}
+void LittleLua::setMember(const char *member, const char *value) {
+  setStringFromTable(member, value);
+}
+void LittleLua::setMember(const char *member, const string value) {
+  setStringFromTable(member, value);
+}
+void LittleLua::setMember(const char *member, const vector<int> integers) {
+  setIntegerVectorFromTable(member, integers);
+}
+void LittleLua::setMember(const char *member, const vector<double> doubles) {
+  setNumberVectorFromTable(member, doubles);
+}
+void LittleLua::setMember(const char *member, const vector<bool> bools) {
+  setBoolVectorFromTable(member, bools);
+}
+void LittleLua::setMember(const char *member, const vector<string> strings) {
+  setStringVectorFromTable(member, strings);
+}
+
 #pragma endregion getters
 
 #pragma region setters
@@ -461,7 +520,7 @@ void LittleLua::createTable(const char *variable) {
 #pragma region functional
 
 void LittleLua::callFunction(const char *functionName,
-                             function<size_t(lua_State * lua)> argList) {
+                             function<size_t(lua_State *lua)> argList) {
   lua_getglobal(_state, functionName);
   if (lua_isfunction(_state, -1)) {
     size_t argCount = argList(_state);
@@ -563,4 +622,64 @@ void LittleLua::_functionStatusHandler(int status) {
   throw LuaException("Unknown Error.");
   // unknown error
 }
+
+void LittleLua::setFunction(const char *functionName,
+                            std::function<int(lua_State *)> callback) {
+  lua_pushlightuserdata(_state, &callback);
+  lua_pushcclosure(_state, _wrapperCFunctionForPassingACFunction, 1);  // I need a wrapper to push an anonymous function
+  lua_setglobal(_state, functionName);
+}
+
 #pragma endregion functional
+int _wrapperCFunctionForPassingACFunction(lua_State *lua) {
+  auto *func = static_cast<std::function<int(lua_State *)> *>(
+      lua_touserdata(lua, lua_upvalueindex(1)));
+  return (*func)(lua);
+}
+void _universalPush(lua_State *lua, const int value) {
+  lua_pushinteger(lua, value);
+}
+void _universalPush(lua_State *lua, const double value) {
+  lua_pushnumber(lua, value);
+}
+void _universalPush(lua_State *lua, const bool value) {
+  lua_pushboolean(lua, value);
+}
+void _universalPush(lua_State *lua, const char *value) {
+  lua_pushstring(lua, value);
+}
+void _universalPush(lua_State *lua, const string value) {
+  lua_pushstring(lua, value.c_str());
+}
+void _universalPush(lua_State *lua, const vector<int> integers) {
+  lua_newtable(lua);
+  for (size_t i = 0; i < integers.size(); i++) {
+    lua_pushinteger(lua, i + 1); // index on lua starts in 1
+    lua_pushinteger(lua, integers[i]);
+    lua_settable(lua, -3);
+  }
+}
+void _universalPush(lua_State *lua, const vector<double> doubles) {
+  lua_newtable(lua);
+  for (size_t i = 0; i < doubles.size(); i++) {
+    lua_pushinteger(lua, i + 1); // index on lua starts in 1
+    lua_pushnumber(lua, doubles[i]);
+    lua_settable(lua, -3);
+  }
+}
+void _universalPush(lua_State *lua, const vector<bool> bools) {
+  lua_newtable(lua);
+  for (size_t i = 0; i < bools.size(); i++) {
+    lua_pushinteger(lua, i + 1); // index on lua starts in 1
+    lua_pushboolean(lua, bools[i]);
+    lua_settable(lua, -3);
+  }
+}
+void _universalPush(lua_State *lua, const vector<string> strings) {
+  lua_newtable(lua);
+  for (size_t i = 0; i < strings.size(); i++) {
+    lua_pushinteger(lua, i + 1); // index on lua starts in 1
+    lua_pushstring(lua, strings[i].c_str());
+    lua_settable(lua, -3);
+  }
+}

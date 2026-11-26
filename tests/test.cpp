@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -14,6 +15,7 @@ const char *path3 = "example3.lua";
 const char *path4 = "example4.lua";
 const char *path5 = "example5.lua";
 const char *path6 = "example6.lua";
+const char *path7 = "example7.lua";
 
 TEST(LuaTest, PrintTest) {
   LittleLua lua;
@@ -239,6 +241,41 @@ TEST(LuaTest, LuaToCFunctionTest)
   lua.close();
 
 
+}
+
+TEST(LuaTest, CtoLuaFunctionTest)
+{
+
+  vector<int> linspace{1,2,3,4,5,6,7};
+
+  LittleLua lua;
+  lua.init();
+  
+  ASSERT_NO_THROW(
+    lua.C_FUNCTION_BEGIN(log)
+    string text = C_ARG_STRING;
+    cout << "Log from C: " << text << endl;
+    C_FUNCTION_END
+  );
+
+  ASSERT_NO_THROW(
+    lua.C_FUNCTION_BEGIN(sum)
+    int b = C_ARG_INT; // The top is the last argument, because we are in a stack and the first argument is pushed first
+    int a = C_ARG_INT; 
+    int res = a + b;
+    C_FUNCTION_RETURN(res)
+  );
+
+  ASSERT_NO_THROW(
+    lua.C_FUNCTION_BEGIN(multiplyby)
+    int m = C_ARG_INT;
+    std::for_each(linspace.begin(), linspace.end(), [m](int &i){i *= m;});
+
+    C_FUNCTION_RETURN(linspace)
+  );
+
+  lua.executeFile(path7);
+  lua.close();
 }
 
 // This only works if "more" were a global variable, but it is a field from this

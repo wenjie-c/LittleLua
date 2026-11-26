@@ -82,6 +82,16 @@ public:
   void setBoolVector(const char *variable, const vector<bool> bools);
   void setStringVector(const char *variable, const vector<string> strings);
 
+  void setVariable(const char *variable, const int value);
+  void setVariable(const char *variable, const double value);
+  void setVariable(const char *variable, const bool value);
+  void setVariable(const char *variable, const char *value);
+  void setVariable(const char *variable, const string value);
+  void setVariable(const char *variable, const vector<int> integers);
+  void setVariable(const char *variable, const vector<double> doubles);
+  void setVariable(const char *variable, const vector<bool> bools);
+  void setVariable(const char *variable, const vector<string> strings);
+
   void setIntegerFromTable(const char *member, const int value);
   void setNumberFromTable(const char *member, const double value);
   void setBoolFromTable(const char *member, const bool value);
@@ -92,6 +102,16 @@ public:
   void setNumberVectorFromTable(const char *member, const vector<double> value);
   void setBoolVectorFromTable(const char *member, const vector<bool> value);
   void setStringVectorFromTable(const char *member, const vector<string> value);
+
+  void setMember(const char *member, const int value);
+  void setMember(const char *member, const double value);
+  void setMember(const char *member, const bool value);
+  void setMember(const char *member, const char *value);
+  void setMember(const char *member, const string value);
+  void setMember(const char *member, const vector<int> integers);
+  void setMember(const char *member, const vector<double> doubles);
+  void setMember(const char *member, const vector<bool> bools);
+  void setMember(const char *member, const vector<string> strings);
 
   /**
    * @brief Create a Table object from scratch
@@ -122,22 +142,27 @@ public:
 
 #pragma region functional
 
+  // Call lua function from c++
+
   /**
    * @brief Call a lua void function with variable arguments.
    *
    * @tparam argTypes
-   * @param functionName
-   * @param argList A function pointer to set all the arguments in order, it
-   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   * @param functionName The name of the function
+   * @param argList A function pointer to send arguments to the lua function in
+   * order, it returns the number of arguments. Use the macro
+   * LUA_ARGS(your_variable).
    */
-  void callFunction(const char *functionName, function<size_t(lua_State* lua)> argList);
+  void callFunction(const char *functionName,
+                    function<size_t(lua_State *lua)> argList);
 
   /**
    * @brief Call a lua integer function with variable arguments.
    *
-   * @param functionName
-   * @param argList A function pointer to set all the arguments in order, it
-   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   * @param functionName The name of the function
+   * @param argList A function pointer to send arguments to the lua function in
+   * order, it returns the number of arguments. Use the macro
+   * LUA_ARGS(your_variable).
    */
   int callIntegerFunction(const char *functionName,
                           function<size_t(lua_State *)> argList);
@@ -145,9 +170,10 @@ public:
   /**
    * @brief Call a lua double function with variable arguments.
    *
-   * @param functionName
-   * @param argList A function pointer to set all the arguments in order, it
-   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   * @param functionName The name of the function
+   * @param argList A function pointer to send arguments to the lua function in
+   * order, it returns the number of arguments. Use the macro
+   * LUA_ARGS(your_variable).
    */
   double callNumberFunction(const char *functionName,
                             function<size_t(lua_State *)> argList);
@@ -155,9 +181,10 @@ public:
   /**
    * @brief Call a lua bool function with variable arguments.
    *
-   * @param functionName
-   * @param argList A function pointer to set all the arguments in order, it
-   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   * @param functionName The name of the function
+   * @param argList A function pointer to send arguments to the lua function in
+   * order, it returns the number of arguments. Use the macro
+   * LUA_ARGS(your_variable).
    */
   bool callBoolFunction(const char *functionName,
                         function<size_t(lua_State *)> argList);
@@ -165,12 +192,25 @@ public:
   /**
    * @brief Call a lua string function with variable arguments.
    *
-   * @param functionName
-   * @param argList A function pointer to set all the arguments in order, it
-   * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
+   * @param functionName The name of the function
+   * @param argList A function pointer to send arguments to the lua function in
+   * order, it returns the number of arguments. Use the macro
+   * LUA_ARGS(your_variable).
    */
   string callStringFunction(const char *functionName,
                             function<size_t(lua_State *)> argList);
+
+  // call C funtion from lua
+
+  /**
+   * @brief Set a Function to lua
+   *
+   * @param functionName Name of the function
+   * @param callback A function pointer to request arguments with macro
+   * <type>_FROM_LUA from lua in order and process it like a callback. It
+   * returns with a macro RETURN_<type>.
+   */
+  void setFunction(const char *functionName, std::function<int(lua_State*)> callback);
 
 #pragma endregion functional
 
@@ -218,4 +258,18 @@ private:
 
 #pragma endregion LittleLua_VARIABLES
 };
+
+#ifndef LuaUtils
+#define LuaUtils
+int _wrapperCFunctionForPassingACFunction(lua_State *lua);
+void _universalPush(lua_State *lua, const int value);
+void _universalPush(lua_State *lua, const double value);
+void _universalPush(lua_State *lua, const bool value);
+void _universalPush(lua_State *lua, const char *value);
+void _universalPush(lua_State *lua, const string value);
+void _universalPush(lua_State *lua, const vector<int> integers);
+void _universalPush(lua_State *lua, const vector<double> doubles);
+void _universalPush(lua_State *lua, const vector<bool> bools);
+void _universalPush(lua_State *lua, const vector<string> strings);
+#endif // !LuaUtils
 #endif // LittleLua_HPP

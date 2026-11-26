@@ -1,5 +1,5 @@
+#include <LittleLua.hpp>
 #include <LuaException.hpp>
-#include<LittleLua.hpp>
 #include <cstddef>
 #include <iostream>
 #include <string>
@@ -11,6 +11,12 @@ extern "C" {
 #include <lua.h>
 #include <lualib.h>
 }
+
+#pragma region Utils
+
+
+
+#pragma endregion Utils
 
 #pragma region Macros
 
@@ -178,7 +184,7 @@ extern "C" {
  *
  */
 #define LUA_FUNCTION_BEGIN(function_name) callFunction(#function_name, \
-  [=](lua_State* lua){ \
+  [&](lua_State* lua){ \
     unsigned int counter = 0;
 
 /**
@@ -222,7 +228,7 @@ extern "C" {
  *
  */
 #define LUA_ARG_INT(x)                                                         \
-  lua_pushinteger(lua,x);                                                          \
+  lua_pushinteger(lua, x);                                                     \
   counter++;
 
 /**
@@ -230,7 +236,7 @@ extern "C" {
  *
  */
 #define LUA_ARG_DOUBLE(x)                                                      \
-  lua_pushnumber(lua,x);                                                           \
+  lua_pushnumber(lua, x);                                                      \
   counter++;
 
 /**
@@ -238,7 +244,7 @@ extern "C" {
  *
  */
 #define LUA_ARG_BOOL(x)                                                        \
-  lua_pushboolean(lua,x);                                                          \
+  lua_pushboolean(lua, x);                                                     \
   counter++;
 
 /**
@@ -246,7 +252,7 @@ extern "C" {
  *
  */
 #define LUA_ARG_STRING(x)                                                      \
-  lua_pushstring(lua,x);                                                           \
+  lua_pushstring(lua, x);                                                      \
   counter++;
 
 /**
@@ -257,7 +263,18 @@ extern "C" {
   return counter;                                                              \
   });
 
-#define LUA_FUNCTION_RETURN_NUMBER 1
+#define C_FUNCTION_BEGIN(x) setFunction(#x, [&](lua_State* lua){ \
+  int counter = -1;
+
+#define C_ARG_INT (lua_isinteger(lua, counter)) ? lua_tointeger(lua, counter) : throw LuaException("This parameter is not an integer."); counter--;
+#define C_ARG_NUMBER (lua_isnumber(lua, counter)) ? lua_tonumber(lua, counter) : throw LuaException("This parameter is not a number."); counter--;
+#define C_ARG_BOOL (lua_isboolean(lua, counter)) ? lua_toboolean(lua, counter) : throw LuaException("This parameter is not a boolean."); counter--;
+#define C_ARG_STRING (lua_isstring(lua, counter)) ? lua_tostring(lua, counter) : throw LuaException("This parameter is not a string."); counter--;
+
+#define C_FUNCTION_END return 1;})
+#define C_FUNCTION_RETURN(x)  _universalPush(lua,x); return 1;})
+  
+
 #pragma endregion FUNCTIONAL
 
 #pragma endregion Macros
