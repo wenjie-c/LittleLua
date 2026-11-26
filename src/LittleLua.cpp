@@ -340,7 +340,7 @@ void LittleLua::setIntegerFromTable(const char *member, const int value) {
   //--_idx;
   lua_setfield(_state, -2,
                member); // idx is fixed on -2 because everytime that a value is
-                      // setted, the value is popped out by lua
+                        // setted, the value is popped out by lua
 }
 void LittleLua::setNumberFromTable(const char *member, const double value) {
   lua_pushnumber(_state, value);
@@ -362,7 +362,8 @@ void LittleLua::setStringFromTable(const char *member, const string value) {
   setStringFromTable(member, value.c_str());
 }
 
-void LittleLua::setIntegerVector(const char *variable, const vector<int> integers) {
+void LittleLua::setIntegerVector(const char *variable,
+                                 const vector<int> integers) {
   lua_newtable(_state);
   for (size_t i = 0; i < integers.size(); i++) {
     lua_pushinteger(_state, i + 1); // index on lua starts in 1
@@ -458,6 +459,93 @@ void LittleLua::createTable(const char *variable) {
 #pragma endregion setters
 
 #pragma region functional
+
+void LittleLua::callFunction(const char *functionName,
+                             function<size_t(lua_State * lua)> argList) {
+  lua_getglobal(_state, functionName);
+  if (lua_isfunction(_state, -1)) {
+    size_t argCount = argList(_state);
+    int status = lua_pcall(_state, argCount, 0, 0); // nothing to return
+
+    _functionStatusHandler(status);
+
+  } else {
+    throw LuaException("Couldn't find the lua function.");
+  }
+}
+
+int LittleLua::callIntegerFunction(const char *functionName,
+                                   function<size_t(lua_State *)> argList) {
+  lua_getglobal(_state, functionName);
+  if (lua_isfunction(_state, -1)) {
+    size_t argCount = argList(_state);
+    int status = lua_pcall(_state, argCount, 1, 0);
+
+    _functionStatusHandler(status);
+
+    return lua_tointeger(_state, -1);
+
+  } else {
+    throw LuaException("Couldn't find the lua function.");
+  }
+
+  return INT32_MIN;
+}
+
+double LittleLua::callNumberFunction(const char *functionName,
+                                     function<size_t(lua_State *)> argList) {
+  lua_getglobal(_state, functionName);
+  if (lua_isfunction(_state, -1)) {
+    size_t argCount = argList(_state);
+    int status = lua_pcall(_state, argCount, 1, 0);
+
+    _functionStatusHandler(status);
+
+    return lua_tonumber(_state, -1);
+
+  } else {
+    throw LuaException("Couldn't find the lua function.");
+  }
+
+  return INT32_MIN;
+}
+
+bool LittleLua::callBoolFunction(const char *functionName,
+                                 function<size_t(lua_State *)> argList) {
+  lua_getglobal(_state, functionName);
+  if (lua_isfunction(_state, -1)) {
+    size_t argCount = argList(_state);
+    int status = lua_pcall(_state, argCount, 1, 0);
+
+    _functionStatusHandler(status);
+
+    return lua_toboolean(_state, -1);
+
+  } else {
+    throw LuaException("Couldn't find the lua function.");
+  }
+
+  return false;
+}
+
+string LittleLua::callStringFunction(const char *functionName,
+                                     function<size_t(lua_State *)> argList) {
+  lua_getglobal(_state, functionName);
+  if (lua_isfunction(_state, -1)) {
+    size_t argCount = argList(_state);
+    int status = lua_pcall(_state, argCount, 1, 0);
+
+    _functionStatusHandler(status);
+
+    return lua_tostring(_state, -1);
+
+  } else {
+    throw LuaException("Couldn't find the lua function.");
+  }
+
+  return "";
+}
+
 void LittleLua::_functionStatusHandler(int status) {
   if (status == LUA_OK) {
     return;

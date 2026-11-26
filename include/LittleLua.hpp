@@ -130,20 +130,7 @@ public:
    * @param argList A function pointer to set all the arguments in order, it
    * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
    */
-  template <class... argTypes>
-  void callFunction(const char *functionName,
-                    function<size_t(argTypes...)> argList) {
-    lua_getglobal(_state, functionName);
-    if (lua_isfunction(_state, -1)) {
-      size_t argCount = argList();
-      int status = lua_pcall(_state, argCount, 0, 0); // nothing to return
-
-      _functionStatusHandler(status);
-
-    } else {
-      throw LuaException("Couldn't find the lua function.");
-    }
-  }
+  void callFunction(const char *functionName, function<size_t(lua_State* lua)> argList);
 
   /**
    * @brief Call a lua integer function with variable arguments.
@@ -153,22 +140,7 @@ public:
    * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
    */
   int callIntegerFunction(const char *functionName,
-                          function<size_t(lua_State *)> argList) {
-    lua_getglobal(_state, functionName);
-    if (lua_isfunction(_state, -1)) {
-      size_t argCount = argList(_state);
-      int status = lua_pcall(_state, argCount, 1, 0);
-
-      _functionStatusHandler(status);
-
-      return lua_tointeger(_state, -1);
-
-    } else {
-      throw LuaException("Couldn't find the lua function.");
-    }
-
-    return INT32_MIN;
-  }
+                          function<size_t(lua_State *)> argList);
 
   /**
    * @brief Call a lua double function with variable arguments.
@@ -178,22 +150,7 @@ public:
    * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
    */
   double callNumberFunction(const char *functionName,
-                            function<size_t(lua_State *)> argList) {
-    lua_getglobal(_state, functionName);
-    if (lua_isfunction(_state, -1)) {
-      size_t argCount = argList(_state);
-      int status = lua_pcall(_state, argCount, 1, 0);
-
-      _functionStatusHandler(status);
-
-      return lua_tonumber(_state, -1);
-
-    } else {
-      throw LuaException("Couldn't find the lua function.");
-    }
-
-    return INT32_MIN;
-  }
+                            function<size_t(lua_State *)> argList);
 
   /**
    * @brief Call a lua bool function with variable arguments.
@@ -203,22 +160,7 @@ public:
    * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
    */
   bool callBoolFunction(const char *functionName,
-                        function<size_t(lua_State *)> argList) {
-    lua_getglobal(_state, functionName);
-    if (lua_isfunction(_state, -1)) {
-      size_t argCount = argList(_state);
-      int status = lua_pcall(_state, argCount, 1, 0);
-
-      _functionStatusHandler(status);
-
-      return lua_toboolean(_state, -1);
-
-    } else {
-      throw LuaException("Couldn't find the lua function.");
-    }
-
-    return false;
-  }
+                        function<size_t(lua_State *)> argList);
 
   /**
    * @brief Call a lua string function with variable arguments.
@@ -228,22 +170,7 @@ public:
    * returns the number of arguments. Use the macro LUA_ARGS(your_variable).
    */
   string callStringFunction(const char *functionName,
-                            function<size_t(lua_State *)> argList) {
-    lua_getglobal(_state, functionName);
-    if (lua_isfunction(_state, -1)) {
-      size_t argCount = argList(_state);
-      int status = lua_pcall(_state, argCount, 1, 0);
-
-      _functionStatusHandler(status);
-
-      return lua_tostring(_state, -1);
-
-    } else {
-      throw LuaException("Couldn't find the lua function.");
-    }
-
-    return "";
-  }
+                            function<size_t(lua_State *)> argList);
 
 #pragma endregion functional
 
